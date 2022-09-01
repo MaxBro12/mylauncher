@@ -5,7 +5,8 @@ from requests import get
 git_api = 'https://api.github.com/repos/'
 
 
-def url_correct(url: str = '') -> bool:
+def is_url_correct(url: str = '') -> bool:
+    '''Проверяет правильность ссылки на гитхаб'''
     api_should_be = r'[https://github.com/]'
     if url.startswith('https:'):
         if match(api_should_be, url):
@@ -13,8 +14,12 @@ def url_correct(url: str = '') -> bool:
     return False
 
 
-def clean_repo_http(url: str = '') -> list:
-    if url_correct(url):
+def clean_repo_http(url: str = '') -> dict:
+    '''Возвращает словарь с ключами:\n
+    user - имя пользователя\n
+    repo - репозиторий\n
+    adt  - дополнительные коренные папки'''
+    if is_url_correct(url):
         url = url.replace('https://github.com/', '')
         if url.endswith('.git'):
             url = url.replace('.git', '')
@@ -41,8 +46,8 @@ def is_folder(file_name: str) -> bool:
 
 
 def get_files(main_api, repos_user, repository, adt_folder='') -> list:
-    '''Возвращает список:
-    [0] - Название папки
+    '''Возвращает список:\n
+    [0] - Название папки\n
     [1] - Список файлов в папке'''
     return [adt_folder, get_content(main_api,
                                     repos_user,
@@ -64,4 +69,6 @@ def get_all_file_names(mainapi, repos_user, repository, adt_folder='') -> list:
 
 
 if __name__ == '__main__':
-    print(clean_repo_http('https://github.com/MaxBro12/mylauncher/code/tyt.git'))
+    print()
+
+    # * КОНЕЦ
