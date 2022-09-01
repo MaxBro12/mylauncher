@@ -1,5 +1,5 @@
 ### Работа с гитом
-https://pyneng.github.io/pyneng-3/GitHub-API-JSON-example/
+https://stackoverflow.com/questions/14120502/how-to-download-and-write-a-file-from-github-using-requests
 
 
 ### OS

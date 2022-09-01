@@ -7,11 +7,14 @@ from requests import get
 def main_check():
     app_dir = getcwd()
 
+    # ! Проверка на наличие лишних файлов в папки с приложением
     empty, files = check_empty_folder(app_dir)
     if not empty:
         print(f'App directory not empty!\nPlease delete or remove files:')
         for i in files:
             print(f'\t{i}')
+
+    # ! Проверки на наличие папки DATA
     check_folder(app_dir)
     check_settings()
 
@@ -43,6 +46,3 @@ def download_file(url):
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
     return local_filename
-
-
-main_check()
