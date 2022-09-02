@@ -2,6 +2,7 @@ from os.path import exists
 from os import mkdir, getcwd, listdir
 from settings import url_set_file, app_files
 from requests import get
+from dbwork import check_db
 
 
 def main_check():
@@ -17,6 +18,9 @@ def main_check():
     # ! Проверки на наличие папки DATA
     check_folder(app_dir)
     check_settings()
+
+    # ! Проверка наличия базы данных
+    check_db()
 
 
 def check_empty_folder(check_dir, exept_files=app_files):

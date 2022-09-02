@@ -4,3 +4,4 @@ __pycache__
 test.*
 *.exe
 /code/data
+base.db
