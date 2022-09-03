@@ -42,6 +42,11 @@ def check_settings():
             set_file.write(get(f'{url_set_file}?raw=true').text)
 
 
+def is_path_correct(local_path: str) -> bool:
+    return exists(local_path)
+
+
+# ! ========================================================================
 def download_file(url):
     local_filename = url.split('/')[-1]
     with get(url, stream=True, allow_redirects=True) as r:

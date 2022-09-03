@@ -10,7 +10,8 @@ def is_url_correct(url: str = '') -> bool:
     api_should_be = r'[https://github.com/]'
     if url.startswith('https:'):
         if match(api_should_be, url):
-            return True
+            if get(url).status_code == 200:
+                return True
     return False
 
 

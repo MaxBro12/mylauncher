@@ -1,4 +1,8 @@
 
+# ! Settings
+version = 'Dev'
+
+
 # ! URLS
 url_set_file = 'https://github.com/MaxBro12/mylauncher/blob/master/source/settings.ini'
 
@@ -13,4 +17,7 @@ app_files = [
     'settings.py',
     'userinp.py',
     'mylaunch.exe',
+    'dbwork.py',
+    'gitapi.py',
+    'test.py',
 ]

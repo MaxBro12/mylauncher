@@ -3,24 +3,6 @@ import sqlite3
 from os.path import exists
 
 
-github_table_c2 = '''CREATE TABLE github (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user TEXT NOT NULL,
-                repo TEXT NOT NULL,
-                adt TEXT);'''
-
-locdir_table_c2 = '''CREATE TABLE local (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                location TEXT NOT NULL)'''
-
-github_table_c = '''CREATE TABLE github (
-                user,
-                repo,
-                adt);'''
-
-locdir_table_c = '''CREATE TABLE local (
-                location)'''
-
 main_table_c = '''CREATE TABLE tracks (
                 user TEXT NOT NULL,
                 repo TEXT NOT NULL,

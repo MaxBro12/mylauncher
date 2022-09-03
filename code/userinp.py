@@ -1,4 +1,6 @@
 from types import NoneType
+from gitapi import is_url_correct
+from check import is_path_correct
 
 
 class UserInp:
@@ -7,16 +9,17 @@ class UserInp:
         self.commands = {
             'help': self.help,
             'stop': self.stop,
-            'hello': self.hello
+            'hello': self.hello,
+            'track': self.track,
         }
 
     def run(self):
         self.progrun = True
-        
+
         while self.progrun:
             self.user_input()
-    
-    def user_input(self): # TODO: Доработать обработку исключений!
+
+    def user_input(self):  # TODO: Доработать обработку исключений!
         word = str(input(': ')).split()
         com = word[0]
         if com in self.commands:
@@ -33,7 +36,7 @@ class UserInp:
         else:
             print(f'Unknown command: "{com}"')
 
-    def help(self, adt = None):
+    def help(self, adt=None):
         if isinstance(adt, NoneType):
             print('List of all commands:')
             for command in self.commands:
@@ -53,5 +56,31 @@ class UserInp:
 
     # * Твои дополнительные функции или методы
     def hello(self):
-        '''Printing hello \o/'''
+        '''Printing hello \\o/'''
         print('Hello, world!')
+
+    def check_git_url(self):
+        gitlink = str(input('Введите ссылку на репозиторий:\n'))
+        if not is_url_correct(gitlink):
+            print('URL is not exists!')
+            return False
+        return gitlink
+
+    def check_local_dir(self):
+        locallink = str(input('Введите ссылку на локальную папку:\n'))
+        if not is_path_correct(locallink):
+            print('Путь до папки не существует!')
+            return False
+        return locallink
+
+    def track(self):
+        '''Запускает отслеживание GitHub репозитория в локальную папку на компьютере.'''
+
+        # ? Проверяем существование GitHub-репозитория
+        gitlink = self.check_git_url()
+        if not gitlink:
+            return False
+        # ? Проверяем существование локальной папки
+        locallink = self.check_local_dir()
+        if not locallink:
+            return False
