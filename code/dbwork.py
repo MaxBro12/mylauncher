@@ -54,11 +54,37 @@ def add_to_db(db: sqlite3.Connection, value: dict):
         return False
 
 
-def get_from_db(db: sqlite3.Connection, id):
-    pass
+def get_all_from_db(db: sqlite3.Connection):
+    try:
+        cursor = db.cursor()
+        cursor.execute(
+            """SELECT * FROM tracks"""
+        )
+        ans = cursor.fetchall()
+        cursor.close()
+        return ans
+    except Exception:
+        cursor.close()
+        return False
 
 
-def remove_from_db(db: sqlite3.Connection, table, value):
+def get_from_db(db: sqlite3.Connection, repo_name):
+    try:
+        cursor = db.cursor()
+        cursor.execute(
+            f"""SELECT * FROM tracks WHERE repo = '{repo_name}'"""
+        )
+        ans = cursor.fetchall()
+        cursor.close()
+        return ans
+    except Exception as error:
+        print(error)
+        cursor.close()
+        return False
+
+
+def remove_from_db(db: sqlite3.Connection, value):
+    # TODO: Сделать метод удаления из базы
     pass
 
 

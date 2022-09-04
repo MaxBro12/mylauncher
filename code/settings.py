@@ -1,6 +1,6 @@
 
 # ! Settings
-version = 'Dev2'
+version = 'Dev'
 
 
 # ! URLS

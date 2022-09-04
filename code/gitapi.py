@@ -69,6 +69,11 @@ def get_all_file_names(mainapi, repos_user, repository, adt_folder='') -> list:
     return files
 
 
+def download_file():
+    # TODO: Написать метод скачивания файлов
+    pass
+
+
 if __name__ == '__main__':
     print()
 

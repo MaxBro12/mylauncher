@@ -1,6 +1,15 @@
 from types import NoneType
-from gitapi import is_url_correct
+from gitapi import (
+    is_url_correct,
+    clean_repo_http,
+)
 from check import is_path_correct
+from dbwork import (
+    load_db,
+    add_to_db,
+    get_all_from_db,
+    get_from_db,
+)
 
 
 class UserInp:
@@ -11,7 +20,10 @@ class UserInp:
             'stop': self.stop,
             'hello': self.hello,
             'track': self.track,
+            'gettracks': self.gettracks,
+            'gettrack': self.gettrack,
         }
+        self.db = load_db()
 
     def run(self):
         self.progrun = True
@@ -84,3 +96,45 @@ class UserInp:
         locallink = self.check_local_dir()
         if not locallink:
             return False
+
+        # ! Добавляем запрос в бд
+        logdata = clean_repo_http(gitlink)
+        logdata['location'] = locallink
+        add_to_db(self.db, logdata)
+
+    def gettracks(self):
+        '''Получить список всех отслеживаний.'''
+        ans = get_all_from_db(self.db)
+        if len(ans) > 0:
+            print('Сейчас отслеживаются эти репозетории:')
+            for i in ans:
+                print(
+                    f'Название: {i[1]}\n\tАвтор: {i[0]}',
+                    f'\n\tРасположение: {i[3]}'
+                )
+        else:
+            print('Сейчас ни что не отслеживается')
+
+    def gettrack(self, ans: str = None):
+        '''Получить информацию об определенном репозитории'''
+        if ans is None:
+            ans = input('Название репозитория:\n')
+        ans = get_from_db(self.db, ans)
+        if ans:
+            print(
+                f'Название: {ans[0][1]}\n' +
+                f'Автор: {ans[0][0]}\n' +
+                f'Папка: {ans[0][3]}\n'
+            )
+        else:
+            print('Такого репозитория нет в базе')
+            if input('Попробовать еще раз? Y - Да / n - нет\n') == 'Y':
+                self.gettrack()
+
+    def removetrack(self):
+        # TODO: Подлючить метод удаления из базы
+        pass
+
+    def downloadtrack(self):
+        # TODO: Подключить метод скачивания файлов
+        pass
