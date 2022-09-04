@@ -1,8 +1,9 @@
 from os.path import exists
 from os import mkdir, getcwd, listdir
-from settings import url_set_file, app_files
+from settings import url_set_file, app_files, version
 from requests import get
 from dbwork import check_db
+from configparser import ConfigParser
 
 
 def main_check():
@@ -22,13 +23,22 @@ def main_check():
     # ! Проверка наличия базы данных
     check_db()
 
+    # ! Проверка версии приложения
+    config = ConfigParser()
+    config.read('data/settings.ini')
+    if config['Main']['version'] != version:
+        print(
+            'Вы используете старую версию приложения!\n',
+            'Скачайте новую на:\nhttps://github.com/MaxBro12/mylauncher'
+        )
+
 
 def check_empty_folder(check_dir, exept_files=app_files):
     all_files = listdir(check_dir)
     all_files = list(filter(lambda x: x not in exept_files, all_files))
     if len(all_files) > 0:
         return False, all_files
-    return True
+    return True, []
 
 
 def check_folder(wd: str):
