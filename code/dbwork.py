@@ -83,9 +83,20 @@ def get_from_db(db: sqlite3.Connection, repo_name):
         return False
 
 
-def remove_from_db(db: sqlite3.Connection, value):
-    # TODO: Сделать метод удаления из базы
-    pass
+def remove_from_db(db: sqlite3.Connection, repo_name):
+    try:
+        cursor = db.cursor()
+        cursor.execute(
+            f"""DELETE FROM tracks WHERE repo = '{repo_name}'"""
+        )
+        ans = cursor.fetchall()
+        db.commit()
+        cursor.close()
+        return True, ans
+    except Exception as error:
+        print(error)
+        cursor.close()
+        return False, [error]
 
 
 if __name__ == '__main__':

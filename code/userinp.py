@@ -1,14 +1,20 @@
 from types import NoneType
+
 from gitapi import (
     is_url_correct,
     clean_repo_http,
 )
-from check import is_path_correct
+from dirwork import (
+    is_path_correct,
+    check_empty_folder,
+    remove_folderAfile,
+)
 from dbwork import (
     load_db,
     add_to_db,
     get_all_from_db,
     get_from_db,
+    remove_from_db,
 )
 
 
@@ -22,6 +28,7 @@ class UserInp:
             'track': self.track,
             'gettracks': self.gettracks,
             'gettrack': self.gettrack,
+            'remove': self.removetrack,
         }
         self.db = load_db()
 
@@ -66,7 +73,7 @@ class UserInp:
         '''Stopping user input'''
         self.progrun = False
 
-    # * Твои дополнительные функции или методы
+    # * Дополнительные функции или методы
     def hello(self):
         '''Printing hello \\o/'''
         print('Hello, world!')
@@ -79,10 +86,12 @@ class UserInp:
         return gitlink
 
     def check_local_dir(self):
-        locallink = str(input('Введите ссылку на локальную папку:\n'))
+        locallink = str(input('Введите путь к локальной папке:\n'))
         if not is_path_correct(locallink):
             print('Путь до папки не существует!')
             return False
+        if not check_empty_folder(locallink)[0]:
+            print('В данной папке находятся файлы! Рекомендуется их удалить перед установкой')
         return locallink
 
     def track(self):
@@ -113,13 +122,18 @@ class UserInp:
                     f'\n\tРасположение: {i[3]}'
                 )
         else:
-            print('Сейчас ни что не отслеживается')
+            print('Сейчас нет отслеживаемых репозиториев')
 
-    def gettrack(self, ans: str = None):
+    def gettrack(self, name: list = None):
         '''Получить информацию об определенном репозитории'''
-        if ans is None:
-            ans = input('Название репозитория:\n')
-        ans = get_from_db(self.db, ans)
+        # ? Если аргумент не передан в функцию
+        if name is None:
+            name = input('Название репозитория:\n')
+        else:
+            name = name[0]
+
+        # ? Запрос в бд
+        ans = get_from_db(self.db, name)
         if ans:
             print(
                 f'Название: {ans[0][1]}\n' +
@@ -131,9 +145,19 @@ class UserInp:
             if input('Попробовать еще раз? Y - Да / n - нет\n') == 'Y':
                 self.gettrack()
 
-    def removetrack(self):
-        # TODO: Подлючить метод удаления из базы
-        pass
+    def removetrack(self, name: list = None):
+        '''Удалить отслеживание определенного репозитория'''
+        # ? Если аргумент не передан в функцию
+        if name is None:
+            name = input('Введите название репозитория:\n')
+        else:
+            name = name[0]
+
+        # ? Запуск удаления
+        if remove_from_db(self.db, name)[0]:
+            print(f'{name} отслеживаниe успешно удалено')
+        else:
+            print('Произошла ошибка при удалении.')
 
     def downloadtrack(self):
         # TODO: Подключить метод скачивания файлов
