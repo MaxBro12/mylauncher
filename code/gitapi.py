@@ -1,7 +1,6 @@
 from re import match
 from requests import get
-
-from dirwork import download_file
+from typing import Union
 
 
 git_api = 'https://api.github.com/repos'
@@ -59,6 +58,7 @@ def get_content(
     api: str = git_api
 ) -> list:
     '''Получаем список всех файлов в конкретной папке'''
+    print(f'{api}/{user}/{repo}/contents/{adt}')
     json = get(f'{api}/{user}/{repo}/contents/{adt}').json()
     return list(map(lambda x: {
         'name': json[x]['name'],
@@ -80,8 +80,16 @@ def split_folders_files(raw_files: list) -> list:
     return files, folders
 
 
-def get_all_files_data(url: str, consol: bool = False) -> list:
-    data = clean_repo_http(url)
+def get_all_files_data(url: Union[str, dict], consol: bool = False) -> list:
+    # ? Проверка типа
+    if type(url) == str:
+        data = clean_repo_http(url)
+    else:
+        data = url
+
+    print(data)
+
+    # ? Базовый запрос файлов
     raw_files = get_content(data['user'], data['repo'], data['adt'])
     files, folders = split_folders_files(raw_files)
 
@@ -116,6 +124,11 @@ def get_all_files_data(url: str, consol: bool = False) -> list:
 
 
 if __name__ == '__main__':
-    files = get_all_files_data('https://github.com/MaxBro12/mylauncher', True)
-
+    test_url = r'https://github.com/MaxBro12/mylauncher'
+    test_dict = {
+        'user': 'MaxBro12',
+        'repo': 'mylauncher',
+        'adt': ''
+    }
+    get_all_files_data(test_url, True)
     # * https://github.com/MaxBro12/mylauncher

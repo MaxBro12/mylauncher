@@ -1,5 +1,6 @@
 from os import (
     listdir,
+    mkdir,
     remove,
 )
 from os.path import (
@@ -23,6 +24,10 @@ def is_path_correct(local_path: str) -> bool:
     return exists(local_path)
 
 
+def is_folder(name: str) -> bool:
+    return name.split('.') == 1
+
+
 def remove_file(file_dir):
     '''Удаляет файл file_name в директории file_dir'''
     remove(f'file_dir')
@@ -37,13 +42,32 @@ def remove_folderAfile(dir_name):
         return False
 
 
-def get_all_files(dir: str) -> list:
-    pass
+def download_file(f_dict: dict, way: str):
+    '''Скачивает файл на путь way'''
+    with open(f"{way}\\{f_dict['path']}", 'w') as f:
+        data = get(f_dict['url']).text
+        f.write(data)
 
 
-def download_file(url: str, way: str):
-    '''Скачивает данные с указаного url в путь way'''
-    pass
+def download_repo(files: list, way: str):
+    '''Скачивает все файлы и автоматически создает папки'''
+    # ! Отделяем названия папок и создаем их
+    ways = []
+    for f in files:
+        w = f['path'].split('/')
+        if len(w) > 1:
+            w.pop()
+            w = '/'.join(w)
+            ways.append(w)
+    ways = set(ways)
+    for w in ways:
+        if not exists(f'{way}/{w}'):
+            mkdir(f'{way}/{w}')
+
+    # ! Тут скачиваем каждый файл отдельно
+    for f in files:
+        print(f"Скачивается: {f['name']} Размер: {f['size']}")
+        download_file(f, way)
 
 
 def download_file_test(url: str, way: str):
