@@ -37,11 +37,21 @@ def remove_folderAfile(dir_name):
         return False
 
 
-def download_file(url):
+def get_all_files(dir: str) -> list:
+    pass
+
+
+def download_file(url: str, way: str):
+    '''Скачивает данные с указаного url в путь way'''
+    pass
+
+
+def download_file_test(url: str, way: str):
+    '''Скачивает данные с указаного url в путь way'''
     local_filename = url.split('/')[-1]
     with get(url, stream=True, allow_redirects=True) as r:
         r.raise_for_status()
-        with open(local_filename, 'wb') as f:
+        with open(f'{way}/{local_filename}', 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
     return local_filename

@@ -1,8 +1,12 @@
 from re import match
 from requests import get
 
+from dirwork import download_file
 
-git_api = 'https://api.github.com/repos/'
+
+git_api = 'https://api.github.com/repos'
+dl_1 = 'https://github.com'
+dl_2 = 'blob/master'
 
 
 def is_url_correct(url: str = '') -> bool:
@@ -21,60 +25,97 @@ def clean_repo_http(url: str = '') -> dict:
     repo - репозиторий\n
     adt  - дополнительные коренные папки'''
     if is_url_correct(url):
+        # ? Очистки
         url = url.replace('https://github.com/', '')
         if url.endswith('.git'):
             url = url.replace('.git', '')
+        if url.endswith('#readme'):
+            url = url.replace('#readme', '')
+        if '//' in url:
+            url = url.replace('//', '/')
+
+        # ? Создание словаря
         ans = dict()
         ans['user'], ans['repo'], *ans['adt'] = url.split('/')
-        return ans
+        if ans['user'] != '':
+            if ans['repo'] != '':
+                ans['adt'] = '/'.join(ans['adt'])
+                return ans
     return False
 
 
-def get_content(api, user, repo, adt=''):
-    '''Получаем список названий всех файлов в папке'''
+def get_api_path(all_files: list) -> list:
+    return list(map(lambda x: x['path'], all_files))
+
+
+def get_download_link(data: dict, f: list) -> list:
+    return f"{dl_1}/{data['user']}/{data['repo']}/{dl_2}/{f['path']}?raw=true"
+
+
+def get_content(
+    user: str = '',
+    repo: str = '',
+    adt: str = '',
+    api: str = git_api
+) -> list:
+    '''Получаем список всех файлов в конкретной папке'''
     json = get(f'{api}/{user}/{repo}/contents/{adt}').json()
-    return list(map(lambda x: json[x]['name'], range(len(json))))
+    return list(map(lambda x: {
+        'name': json[x]['name'],
+        'path': json[x]['path'],
+        'type': json[x]['type'],
+        'size': json[x]['size'],
+    }, range(len(json))))
 
 
-def get_folders(list_of_files):
-    '''Возвращается только список папок'''
-    return list(filter(lambda x: len(x.split('.')) == 1, list_of_files))
-
-
-def is_folder(file_name: str) -> bool:
-    '''Вопрос это папка?'''
-    return len(file_name.split('.')) == 1
-
-
-def get_files(main_api, repos_user, repository, adt_folder='') -> list:
-    '''Возвращает список:\n
-    [0] - Название папки\n
-    [1] - Список файлов в папке'''
-    return [adt_folder, get_content(main_api,
-                                    repos_user,
-                                    repository,
-                                    adt_folder)]
-
-
-def get_all_file_names(mainapi, repos_user, repository, adt_folder='') -> list:
-    base_files = get_content(mainapi, repos_user, repository, adt_folder)
+def split_folders_files(raw_files: list) -> list:
     files = []
-    for file_name in base_files:
-        if not is_folder(file_name):
-            print(f'Is file: {file_name}')
-            files.append(file_name)
-        else:
-            print(f'==== Folder: {file_name}')
-            files.append(get_files(mainapi, repos_user, repository, file_name))
+    folders = []
+
+    for raw_file in raw_files:
+        if raw_file['type'] == 'file':
+            files.append(raw_file)
+        elif raw_file['type'] == 'dir':
+            folders.append(raw_file)
+    return files, folders
+
+
+def get_all_files_data(url: str, consol: bool = False) -> list:
+    data = clean_repo_http(url)
+    raw_files = get_content(data['user'], data['repo'], data['adt'])
+    files, folders = split_folders_files(raw_files)
+
+    # ? В цикле ищим врутренние папки
+    for folder in folders:
+        raw_files = get_content(data['user'], data['repo'], folder['name'])
+        files_new, folders_new = split_folders_files(raw_files)
+        files = files + files_new
+        folders = folders + folders_new
+
+    # ? Добавляем в словарь URL
+    for f in files:
+        f['url'] = get_download_link(data, f)
+
+    # ! Тестовый вывод
+    if consol:
+        print('Файлы:')
+        for f in files:
+            print(
+                f"\tНазвание: {f['name']}\n" +
+                f"\tПуть: {f['path']}\n" +
+                f"\tРазмер: {f['size']}\n" +
+                f"\tURL: {f['url']}\n"
+            )
+        print('Папки:')
+        for f in folders:
+            print(
+                f"\tНазвание: {f['name']}\n" +
+                f"\tПуть: {f['path']}\n"
+            )
     return files
 
 
-def download_file():
-    # TODO: Написать метод скачивания файлов
-    pass
-
-
 if __name__ == '__main__':
-    print()
+    files = get_all_files_data('https://github.com/MaxBro12/mylauncher', True)
 
-    # * КОНЕЦ
+    # * https://github.com/MaxBro12/mylauncher
