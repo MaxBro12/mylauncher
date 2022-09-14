@@ -1,8 +1,10 @@
 .idea
 .vscode
+icon.png
+py_to_exe.bat
 __pycache__
 test.*
-*.exe
 /code/data
+/app/data
 base.db
 test

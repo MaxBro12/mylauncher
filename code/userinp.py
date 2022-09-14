@@ -31,11 +31,16 @@ class UserInp:
             'gtrack': self.gettrack,
             'remove': self.removetrack,
             'downtrack': self.downloadtrack,
+            'checkgit': self.check_git_url,
+            'checkpath': self.check_local_dir,
         }
         self.db = load_db()
 
     def run(self):
         self.progrun = True
+
+        # ! Приветствующий скрипт
+        print('Используйте команду "help" для получения помощи')
 
         while self.progrun:
             self.user_input()
@@ -67,7 +72,7 @@ class UserInp:
             try:
                 adt = str(adt[0])
                 if adt in self.commands:
-                    print(f'info about {adt}:\n\t{self.commands[adt].__doc__}')
+                    print(f'{adt}:\n\t{self.commands[adt].__doc__}')
             except TypeError:
                 print(f'Unknown command {adt}, use "help" command')
                 self.user_input()

@@ -21,4 +21,5 @@ app_files = [
     'gitapi.py',
     'test.py',
     'dirwork.py',
+    'py_to_exe.bat',
 ]
