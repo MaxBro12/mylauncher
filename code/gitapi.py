@@ -2,10 +2,14 @@ from re import match
 from requests import get
 from typing import Union
 
+from dirwork import download_repo
+
 
 git_api = 'https://api.github.com/repos'
-dl_1 = 'https://github.com'
-dl_2 = 'blob/master'
+# dl_1 = 'https://github.com'
+# dl_2 = 'blob/master'
+
+dl_1 = 'https://raw.githubusercontent.com/'
 
 
 def is_url_correct(url: str = '') -> bool:
@@ -47,8 +51,13 @@ def get_api_path(all_files: list) -> list:
     return list(map(lambda x: x['path'], all_files))
 
 
+def get_def_branch(data: dict) -> str:
+    ans = get(f"{git_api}/{data['user']}/{data['repo']}/branches").json()
+    return ans[0]['name']
+
+
 def get_download_link(data: dict, f: list) -> list:
-    return f"{dl_1}/{data['user']}/{data['repo']}/{dl_2}/{f['path']}?raw=true"
+    return f"{dl_1}/{data['user']}/{data['repo']}/{data['branch']}/{f['path']}?raw=true"
 
 
 def get_content(
@@ -87,7 +96,7 @@ def get_all_files_data(url: Union[str, dict], consol: bool = False) -> list:
     else:
         data = url
 
-    print(data)
+    data['branch'] = get_def_branch(data)
 
     # ? Базовый запрос файлов
     raw_files = get_content(data['user'], data['repo'], data['adt'])
@@ -124,11 +133,12 @@ def get_all_files_data(url: Union[str, dict], consol: bool = False) -> list:
 
 
 if __name__ == '__main__':
-    test_url = r'https://github.com/MaxBro12/mylauncher'
+    test_url = r'https://github.com/MaxBro12/GitApi_test'
     test_dict = {
         'user': 'MaxBro12',
-        'repo': 'mylauncher',
+        'repo': 'GitApi_test',
         'adt': ''
     }
-    get_all_files_data(test_url, True)
+    # files = get_all_files_data(test_url, True)
+    # download_repo(files, r'G:\CODING\_Projects\mylauncher\test')
     # * https://github.com/MaxBro12/mylauncher

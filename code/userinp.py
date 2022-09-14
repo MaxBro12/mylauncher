@@ -3,11 +3,13 @@ from types import NoneType
 from gitapi import (
     is_url_correct,
     clean_repo_http,
+    get_all_files_data
 )
 from dirwork import (
     is_path_correct,
     check_empty_folder,
     remove_folderAfile,
+    download_repo,
 )
 from dbwork import (
     load_db,
@@ -26,9 +28,10 @@ class UserInp:
             'stop': self.stop,
             'hello': self.hello,
             'track': self.track,
-            'gettracks': self.gettracks,
-            'gettrack': self.gettrack,
+            'gtracks': self.gettracks,
+            'gtrack': self.gettrack,
             'remove': self.removetrack,
+            'downtrack': self.downloadtrack,
         }
         self.db = load_db()
 
@@ -118,8 +121,8 @@ class UserInp:
             print('Сейчас отслеживаются эти репозетории:')
             for i in ans:
                 print(
-                    f'Название: {i[1]}\n\tАвтор: {i[0]}',
-                    f'\n\tРасположение: {i[3]}'
+                    f"Название: {i['repo']}\n\tАвтор: {i['user']}",
+                    f"\n\tРасположение: {i['local']}"
                 )
         else:
             print('Сейчас нет отслеживаемых репозиториев')
@@ -134,11 +137,13 @@ class UserInp:
 
         # ? Запрос в бд
         ans = get_from_db(self.db, name)
+
+        # ! Вывод
         if ans:
             print(
-                f'Название: {ans[0][1]}\n' +
-                f'Автор: {ans[0][0]}\n' +
-                f'Папка: {ans[0][3]}\n'
+                f'Название: {ans["repo"]}\n' +
+                f'Автор: {ans["user"]}\n' +
+                f'Папка: {ans["local"]}\n'
             )
         else:
             print('Такого репозитория нет в базе')
@@ -159,6 +164,16 @@ class UserInp:
         else:
             print('Произошла ошибка при удалении.')
 
-    def downloadtrack(self):
-        # TODO: Подключить метод скачивания файлов
-        pass
+    def downloadtrack(self, name: list = None):
+        # ? Если аргумент не передан в функцию
+        if name is None:
+            name = input('Название репозитория:\n')
+        else:
+            name = name[0]
+
+        # ? Запрос в бд
+        ans = get_from_db(self.db, name)
+
+        # ! Запуск скачивания
+        files = get_all_files_data(ans)
+        download_repo(files, ans['local'])

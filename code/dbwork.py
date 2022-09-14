@@ -60,21 +60,37 @@ def get_all_from_db(db: sqlite3.Connection):
         cursor.execute(
             """SELECT * FROM tracks"""
         )
-        ans = cursor.fetchall()
+        a = cursor.fetchall()
+        ans = []
+        for i in a:
+            b = {
+                'user': i[0],
+                'repo': i[1],
+                'adt': i[2],
+                'local': i[3],
+            }
+            ans.append(b)
         cursor.close()
         return ans
-    except Exception:
+    except Exception as error:
+        print(error)
         cursor.close()
         return False
 
 
-def get_from_db(db: sqlite3.Connection, repo_name):
+def get_from_db(db: sqlite3.Connection, repo_name) -> dict:
     try:
         cursor = db.cursor()
         cursor.execute(
             f"""SELECT * FROM tracks WHERE repo = '{repo_name}'"""
         )
-        ans = cursor.fetchall()
+        a = cursor.fetchall()
+        ans = {
+            'user': a[0][0],
+            'repo': a[0][1],
+            'adt': a[0][2],
+            'local': a[0][3],
+        }
         cursor.close()
         return ans
     except Exception as error:
