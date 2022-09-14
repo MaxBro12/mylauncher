@@ -26,7 +26,6 @@ class UserInp:
         self.commands = {
             'help': self.help,
             'stop': self.stop,
-            'hello': self.hello,
             'track': self.track,
             'gtracks': self.gettracks,
             'gtrack': self.gettrack,
@@ -41,7 +40,7 @@ class UserInp:
         while self.progrun:
             self.user_input()
 
-    def user_input(self):  # TODO: Доработать обработку исключений!
+    def user_input(self):
         word = str(input(': ')).split()
         com = word[0]
         if com in self.commands:
@@ -53,14 +52,15 @@ class UserInp:
                 else:
                     return command()
             except TypeError:
-                print('Wrong command!')
+                print('Неверная команда!')
                 self.user_input()
         else:
-            print(f'Unknown command: "{com}"')
+            print(f'Неизвестная команда: "{com}"')
 
     def help(self, adt=None):
+        '''Помощь!'''
         if isinstance(adt, NoneType):
-            print('List of all commands:')
+            print('Список всех команд:')
             for command in self.commands:
                 print(f'\t{command} - {self.commands[command].__doc__}')
         else:
@@ -73,15 +73,12 @@ class UserInp:
                 self.user_input()
 
     def stop(self):
-        '''Stopping user input'''
+        '''Остановка приложения'''
         self.progrun = False
 
-    # * Дополнительные функции или методы
-    def hello(self):
-        '''Printing hello \\o/'''
-        print('Hello, world!')
-
+    # ! ================ ОСНОВА ===================
     def check_git_url(self):
+        '''Проверяет гитхаб ссылку на её существование'''
         gitlink = str(input('Введите ссылку на репозиторий:\n'))
         if not is_url_correct(gitlink):
             print('URL is not exists!')
@@ -89,6 +86,7 @@ class UserInp:
         return gitlink
 
     def check_local_dir(self):
+        '''Проверяет существование данного пути'''
         locallink = str(input('Введите путь к локальной папке:\n'))
         if not is_path_correct(locallink):
             print('Путь до папки не существует!')
@@ -165,6 +163,8 @@ class UserInp:
             print('Произошла ошибка при удалении.')
 
     def downloadtrack(self, name: list = None):
+        '''Запускает процесс скачивания репозитория.
+        Внимание! Репозиторий должен отслеживаться командой track'''
         # ? Если аргумент не передан в функцию
         if name is None:
             name = input('Название репозитория:\n')

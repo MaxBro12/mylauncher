@@ -44,7 +44,7 @@ def remove_folderAfile(dir_name):
 
 def download_file(f_dict: dict, way: str):
     '''Скачивает файл на путь way'''
-    with open(f"{way}\\{f_dict['path']}", 'w') as f:
+    with open(f"{way}/{f_dict['path']}", 'w') as f:
         data = get(f_dict['url']).text
         f.write(data)
 

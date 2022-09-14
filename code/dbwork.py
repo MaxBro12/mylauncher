@@ -37,6 +37,7 @@ def load_db() -> sqlite3.Connection:
 
 
 def add_to_db(db: sqlite3.Connection, value: dict):
+    '''Добавляем значение в базу данных'''
     try:
         cursor = db.cursor()
         cursor.execute(
@@ -55,6 +56,11 @@ def add_to_db(db: sqlite3.Connection, value: dict):
 
 
 def get_all_from_db(db: sqlite3.Connection):
+    '''Возвращает список из словарей всех отслеживаемых репозиториев. Ключи:
+    'user' - имя пользователя / создателя репозитория
+    'repo' - название репозитория
+    'adt' - дополнительная ссылка
+    'local' - путь к папке, где должен находиться репозиторий'''
     try:
         cursor = db.cursor()
         cursor.execute(
@@ -79,6 +85,11 @@ def get_all_from_db(db: sqlite3.Connection):
 
 
 def get_from_db(db: sqlite3.Connection, repo_name) -> dict:
+    '''Возвращает словарь с ключами:
+    'user' - имя пользователя / создателя репозитория
+    'repo' - название репозитория
+    'adt' - дополнительная ссылка
+    'local' - путь к папке, где должен находиться репозиторий'''
     try:
         cursor = db.cursor()
         cursor.execute(
@@ -99,7 +110,11 @@ def get_from_db(db: sqlite3.Connection, repo_name) -> dict:
         return False
 
 
-def remove_from_db(db: sqlite3.Connection, repo_name):
+def remove_from_db(db: sqlite3.Connection, repo_name: str) -> list:
+    '''Удаляем все репозитории с названием repo_name.
+    Возвращает список где:
+    [0] - bool - успешно ли было произведено удаление
+    [1] - список со всей информацией об удалении'''
     try:
         cursor = db.cursor()
         cursor.execute(

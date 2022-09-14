@@ -1,5 +1,6 @@
 from os.path import exists
 from os import mkdir, getcwd
+
 from dirwork import check_empty_folder
 from settings import url_set_file, version
 from requests import get
@@ -13,7 +14,7 @@ def main_check():
     # ! Проверка на наличие лишних файлов в папки с приложением
     empty, files = check_empty_folder(app_dir)
     if not empty:
-        print(f'App directory not empty!\nPlease delete or remove files:')
+        print('Внимание! Дериктория приложения занята сторонними файлами\nПожалуйста удалите или переместите данные файлы:')
         for i in files:
             print(f'\t{i}')
 
@@ -34,6 +35,7 @@ def main_check():
         )
 
 
+# ! ======== ПРОВЕРКИ и СОЗДАНИЕ =========
 def check_folder(wd: str):
     if not exists(f'{wd}/data'):
         mkdir('data')
