@@ -1,9 +1,11 @@
 from types import NoneType
+from copy import copy
 
 from gitapi import (
     is_url_correct,
     clean_repo_http,
-    get_all_files_data
+    get_all_files_data_git,
+    get_def_branch_sha
 )
 from dirwork import (
     is_path_correct,
@@ -17,6 +19,7 @@ from dbwork import (
     get_all_from_db,
     get_from_db,
     remove_from_db,
+    change_data,
 )
 
 
@@ -27,10 +30,11 @@ class UserInp:
             'help': self.help,
             'stop': self.stop,
             'track': self.track,
-            'gtracks': self.gettracks,
-            'gtrack': self.gettrack,
-            'remove': self.removetrack,
+            'list': self.gettracks,
             'downtrack': self.downloadtrack,
+            'update': self.updatetracks,
+            'getdata': self.gettrack,
+            'remove': self.removetrack,
             'checkgit': self.check_git_url,
             'checkpath': self.check_local_dir,
         }
@@ -97,7 +101,10 @@ class UserInp:
             print('Путь до папки не существует!')
             return False
         if not check_empty_folder(locallink)[0]:
-            print('В данной папке находятся файлы! Рекомендуется их удалить перед установкой')
+            print(
+                'В данной папке находятся файлы!' +
+                'Рекомендуется их удалить перед установкой'
+            )
         return locallink
 
     def track(self):
@@ -146,7 +153,9 @@ class UserInp:
             print(
                 f'Название: {ans["repo"]}\n' +
                 f'Автор: {ans["user"]}\n' +
-                f'Папка: {ans["local"]}\n'
+                f'Папка: {ans["local"]}\n' +
+                f'Ветка: {ans["branch"]}\n' +
+                f'Коммит: {ans["sha"]}'
             )
         else:
             print('Такого репозитория нет в базе')
@@ -180,5 +189,36 @@ class UserInp:
         ans = get_from_db(self.db, name)
 
         # ! Запуск скачивания
-        files = get_all_files_data(ans)
+        files, ans = get_all_files_data_git(ans)
         download_repo(files, ans['local'])
+        change_data(self.db, ans)
+
+    def updatetracks(self):
+        '''Запрашивает данные об актуальных версиях репозиториев.
+        Так же их скачивает.'''
+        try:
+            tracks = get_all_from_db(self.db)
+
+            # ? Получаем список репозиториев, требующих обновления
+            need_up = []
+            for track in tracks:
+                new = copy(track)
+                new['branch'], new['sha'] = get_def_branch_sha(new)
+                if track['sha'] != new['sha']:
+                    need_up.append([track, new])
+
+            # ! Сообщаем об обновлении
+            print('Данные пакеты требуют обновления:')
+            for i in need_up:
+                print(
+                    f"\tНазвание: {i[0]['repo']}",
+                    f"\n\tСтарая версия: {i[0]['sha']}",
+                    f"\n\tНовая  версия: {i[1]['sha']}",
+                )
+
+            if input('Обновить? [Y / n]') == 'Y':
+                for track in need_up:
+                    print(track)
+                    self.downloadtrack([track[0]['repo']])
+        except Exception as error:
+            print(error)

@@ -1,5 +1,6 @@
 from os.path import exists
 from os import mkdir, getcwd
+from requests import get
 
 from dirwork import check_empty_folder
 from settings import url_set_file, version
@@ -14,7 +15,10 @@ def main_check():
     # ! Проверка на наличие лишних файлов в папки с приложением
     empty, files = check_empty_folder(app_dir)
     if not empty:
-        print('Внимание! Дериктория приложения занята сторонними файлами\nПожалуйста удалите или переместите данные файлы:')
+        print(
+            'Внимание! Дериктория приложения занята сторонними файлами\n' +
+            'Пожалуйста удалите или переместите данные файлы:'
+        )
         for i in files:
             print(f'\t{i}')
 
@@ -26,12 +30,18 @@ def main_check():
     check_db()
 
     # ! Проверка версии приложения
-    config = ConfigParser()
-    config.read('data/settings.ini')
-    if config['Main']['version'] != version:
+    try:
+        config = ConfigParser()
+        config.read_string(get(f'{url_set_file}?raw=true').text)
+        if config['Main']['version'] != version:
+            print(
+                'Вы используете старую версию приложения!\n' +
+                'Скачайте новую на:\nhttps://github.com/MaxBro12/mylauncher'
+            )
+    except Exception as error:
         print(
-            'Вы используете старую версию приложения!\n',
-            'Скачайте новую на:\nhttps://github.com/MaxBro12/mylauncher'
+            'Не удалось получить данные о версии приложения!\n' +
+            f'{error}'
         )
 
 

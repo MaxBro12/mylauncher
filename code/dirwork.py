@@ -42,6 +42,11 @@ def remove_folderAfile(dir_name):
         return False
 
 
+def get_all_files_dirdata():
+    pass
+
+
+# ! =================== С К А Ч И В А Н И Е ===================
 def download_file(f_dict: dict, way: str):
     '''Скачивает файл на путь way'''
     with open(f"{way}/{f_dict['path']}", 'w') as f:

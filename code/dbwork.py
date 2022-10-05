@@ -7,7 +7,9 @@ main_table_c = '''CREATE TABLE tracks (
                 user TEXT NOT NULL,
                 repo TEXT NOT NULL,
                 adt TEXT,
-                location TEXT NOT NULL);'''
+                location TEXT NOT NULL,
+                branch TEXT,
+                sha TEXT);'''
 
 
 def check_db():
@@ -55,12 +57,34 @@ def add_to_db(db: sqlite3.Connection, value: dict):
         return False
 
 
+def change_data(db: sqlite3.Connection, data: dict):
+    '''Изменяет значение в базе данных.'''
+    try:
+        cursor = db.cursor()
+        cursor.execute(
+            f"""
+            UPDATE Tracks SET
+            branch =  '{data['branch']}',
+            sha = '{data['sha']}'
+            WHERE repo = '{data['repo']}'"""
+        )
+
+        db.commit()
+
+        cursor.close()
+    except Exception:
+        cursor.close()
+        return False
+
+
 def get_all_from_db(db: sqlite3.Connection):
     '''Возвращает список из словарей всех отслеживаемых репозиториев. Ключи:
     'user' - имя пользователя / создателя репозитория
     'repo' - название репозитория
     'adt' - дополнительная ссылка
-    'local' - путь к папке, где должен находиться репозиторий'''
+    'local' - путь к папке, где должен находиться репозиторий
+    'branch' - ветка
+    'sha' - последний коммит'''
     try:
         cursor = db.cursor()
         cursor.execute(
@@ -74,6 +98,8 @@ def get_all_from_db(db: sqlite3.Connection):
                 'repo': i[1],
                 'adt': i[2],
                 'local': i[3],
+                'branch': i[4],
+                'sha': i[5],
             }
             ans.append(b)
         cursor.close()
@@ -89,7 +115,9 @@ def get_from_db(db: sqlite3.Connection, repo_name) -> dict:
     'user' - имя пользователя / создателя репозитория
     'repo' - название репозитория
     'adt' - дополнительная ссылка
-    'local' - путь к папке, где должен находиться репозиторий'''
+    'local' - путь к папке, где должен находиться репозиторий
+    'branch' - ветка
+    'sha' - последний коммит'''
     try:
         cursor = db.cursor()
         cursor.execute(
@@ -101,6 +129,8 @@ def get_from_db(db: sqlite3.Connection, repo_name) -> dict:
             'repo': a[0][1],
             'adt': a[0][2],
             'local': a[0][3],
+            'branch': a[0][4],
+            'sha': a[0][5],
         }
         cursor.close()
         return ans
@@ -131,15 +161,20 @@ def remove_from_db(db: sqlite3.Connection, repo_name: str) -> list:
 
 
 if __name__ == '__main__':
+    # ! Базовый запуск
     check_db()
     db = load_db()
-    test_1 = {
+    data = {
         'user': 'MaxBro12',
         'repo': 'mylauncher',
         'adt': None,
-        'location': 'here',
+        'local': 'here',
+        'branch': '',
+        'sha': '',
     }
 
-    add_to_db(db, test_1)
+    data_test = get_from_db(db, 'GitApi_test')
+
+    change_data(db, data_test)
 
     db.close()

@@ -22,7 +22,7 @@ def is_url_correct(url: str = '') -> bool:
     return False
 
 
-def clean_repo_http(url: str = '') -> dict:
+def clean_repo_http(url: str = '', full: bool = False) -> dict:
     '''Возвращает словарь с ключами:\n
     user - имя пользователя\n
     repo - репозиторий\n
@@ -43,6 +43,8 @@ def clean_repo_http(url: str = '') -> dict:
         if ans['user'] != '':
             if ans['repo'] != '':
                 ans['adt'] = '/'.join(ans['adt'])
+                if full:
+                    ans['branch'], ans['sha'] = get_def_branch_sha(ans)
                 return ans
     return False
 
@@ -51,9 +53,9 @@ def get_api_path(all_files: list) -> list:
     return list(map(lambda x: x['path'], all_files))
 
 
-def get_def_branch(data: dict) -> str:
+def get_def_branch_sha(data: dict) -> str:
     ans = get(f"{git_api}/{data['user']}/{data['repo']}/branches").json()
-    return ans[0]['name']
+    return ans[0]['name'], ans[0]['commit']['sha']
 
 
 def get_download_link(data: dict, f: list) -> list:
@@ -89,14 +91,14 @@ def split_folders_files(raw_files: list) -> list:
     return files, folders
 
 
-def get_all_files_data(url: Union[str, dict], consol: bool = False) -> list:
+def get_all_files_data_git(url: Union[str, dict], consol: bool = False) -> list:
     # ? Проверка типа
     if type(url) == str:
         data = clean_repo_http(url)
     else:
         data = url
 
-    data['branch'] = get_def_branch(data)
+    data['branch'], data['sha'] = get_def_branch_sha(data)
 
     # ? Базовый запрос файлов
     raw_files = get_content(data['user'], data['repo'], data['adt'])
@@ -129,7 +131,7 @@ def get_all_files_data(url: Union[str, dict], consol: bool = False) -> list:
                 f"\tНазвание: {f['name']}\n" +
                 f"\tПуть: {f['path']}\n"
             )
-    return files
+    return files, data
 
 
 if __name__ == '__main__':
@@ -139,6 +141,7 @@ if __name__ == '__main__':
         'repo': 'GitApi_test',
         'adt': ''
     }
-    # files = get_all_files_data(test_url, True)
+    print(clean_repo_http(test_url, True))
+    # files = get_all_files_data_git(test_url, True)
     # download_repo(files, r'G:\CODING\_Projects\mylauncher\test')
     # * https://github.com/MaxBro12/mylauncher
