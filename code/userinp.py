@@ -108,21 +108,57 @@ class UserInp:
         return locallink
 
     def track(self):
-        '''Запускает отслеживание GitHub репозитория в локальную папку на компьютере.'''
+        '''Добавляет отслеживание github репозитория'''
 
         # ? Проверяем существование GitHub-репозитория
         gitlink = self.check_git_url()
         if not gitlink:
             return False
+
         # ? Проверяем существование локальной папки
         locallink = self.check_local_dir()
         if not locallink:
             return False
 
-        # ! Добавляем запрос в бд
+        # ? Спрашиваем о существовании ветки
+        branch = input(
+            'Введите название отслеживаемой ветки:\n' +
+            '(если не знаете что это такое нажмите "enter")\n'
+        )
+
+        # ! Формируем словарь
         logdata = clean_repo_http(gitlink)
         logdata['location'] = locallink
-        add_to_db(self.db, logdata)
+        if branch != '':
+            logdata['branch'] = branch
+
+        # ! Добавляем запрос в бд
+        if add_to_db(self.db, logdata):
+            print('Отслеживание добавлено')
+        else:
+            print('Ошибка в базе данных')
+
+    def change_add_tree(self, adt: list):
+        '''
+        Устанавливает git ветку.
+        '''
+        # * Дополнительные параметры в формате списка:
+        # * [0] - bool изменение (True) или создание (False)
+        # * [1] - название репозитория
+
+        # ? Получаем данные о репозитории
+        repo = input('Введите название репозитория:\n')
+        repo = get_from_db(self.db, repo)
+
+        # ? Изменяем ветку
+        branch = input('Введите название ветки:\n')
+        repo['branch'] = branch
+
+        # ? Обратная связь
+        if change_data(self.db, repo):
+            print('Данные о ветки перезаписаны')
+        else:
+            print('Ошибка в базе данных')
 
     def gettracks(self):
         '''Получить список всех отслеживаний.'''
@@ -163,22 +199,43 @@ class UserInp:
                 self.gettrack()
 
     def removetrack(self, name: list = None):
-        '''Удалить отслеживание определенного репозитория'''
+        '''Удалить репозиторий'''
         # ? Если аргумент не передан в функцию
         if name is None:
             name = input('Введите название репозитория:\n')
         else:
             name = name[0]
 
-        # ? Запуск удаления
-        if remove_from_db(self.db, name)[0]:
-            print(f'{name} отслеживаниe успешно удалено')
-        else:
-            print('Произошла ошибка при удалении.')
+        # ? Запрос в бд
+        data = get_from_db(self.db, name)
+
+        # ! Обработка ошибок
+        if data is False:
+            print(f'Репозиторий "{name}" не отслеживается.')
+            if input('Повторить команду? [Y / n]\n') == 'Y':
+                self.removetrack()
+                return None
+            else:
+                self.user_input()
+                return None
+
+        # ? Удаления файлов
+        if input('Удалить файлы? [Y / n]\n') == 'Y':
+            if remove_folderAfile(data['local']):
+                print('Файлы успешно удалены')
+            else:
+                print('Ошибка в удалении файлов!')
+
+        # ? Удаление отслеживания
+        if input('Удалить отслеживание? [Y / n]\n') == 'Y':
+            if remove_from_db(self.db, name)[0]:
+                print(f'{name} отслеживаниe успешно удалено')
+            else:
+                print('Произошла ошибка при удалении.')
 
     def downloadtrack(self, name: list = None):
         '''Запускает процесс скачивания репозитория.
-        Внимание! Репозиторий должен отслеживаться командой track'''
+        \tВнимание! Репозиторий должен отслеживаться командой track'''
         # ? Если аргумент не передан в функцию
         if name is None:
             name = input('Название репозитория:\n')
@@ -194,8 +251,7 @@ class UserInp:
         change_data(self.db, ans)
 
     def updatetracks(self):
-        '''Запрашивает данные об актуальных версиях репозиториев.
-        Так же их скачивает.'''
+        '''Запрашивает данные об актуальных версиях репозиториев.'''
         try:
             tracks = get_all_from_db(self.db)
 
@@ -216,7 +272,7 @@ class UserInp:
                     f"\n\tНовая  версия: {i[1]['sha']}",
                 )
 
-            if input('Обновить? [Y / n]') == 'Y':
+            if input('Обновить? [Y / n]\n') == 'Y':
                 for track in need_up:
                     print(track)
                     self.downloadtrack([track[0]['repo']])

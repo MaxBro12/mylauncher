@@ -98,7 +98,13 @@ def get_all_files_data_git(url: Union[str, dict], consol: bool = False) -> list:
     else:
         data = url
 
-    data['branch'], data['sha'] = get_def_branch_sha(data)
+    temp = get_def_branch_sha(data)
+    try:
+        d = data['branch']
+    except KeyError:
+        data['branch'], data['sha'] = temp
+    else:
+        data['sha'] = temp[1]
 
     # ? Базовый запрос файлов
     raw_files = get_content(data['user'], data['repo'], data['adt'])

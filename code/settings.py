@@ -1,6 +1,6 @@
 
 # ! Settings
-version = 'beta1'
+version = 'beta1.1'
 
 
 # ! URLS

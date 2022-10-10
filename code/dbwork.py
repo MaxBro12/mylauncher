@@ -52,6 +52,7 @@ def add_to_db(db: sqlite3.Connection, value: dict):
         db.commit()
 
         cursor.close()
+        return True
     except Exception:
         cursor.close()
         return False
@@ -72,6 +73,7 @@ def change_data(db: sqlite3.Connection, data: dict):
         db.commit()
 
         cursor.close()
+        return True
     except Exception:
         cursor.close()
         return False
