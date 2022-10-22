@@ -22,18 +22,27 @@ def main_check():
         for i in files:
             print(f'\t{i}')
 
-    # ! Проверки на наличие папки DATA
-    check_folder(app_dir)
+    # ! Проверки на наличие папки DATA, TRACKS и SETTINGS
+    check_data(app_dir)
+    check_tracks(app_dir)
     check_settings()
 
     # ! Проверка наличия базы данных
     check_db()
 
+    # ! Загрузка конфига
+    config = ConfigParser()
+    config.read('data/settings.ini')
+
+    # ! Проверка настроек и места положения приложения
+    # check_app_dir(app_dir, config)
+
     # ! Проверка версии приложения
     try:
-        config = ConfigParser()
-        config.read_string(get(f'{url_set_file}?raw=true').text)
-        if config['Main']['version'] != version:
+        config_call = ConfigParser()
+        config_call.read_string(get(f'{url_set_file}?raw=true').text)
+
+        if config_call['Main']['version'] != version:
             print(
                 'Вы используете старую версию приложения!\n' +
                 'Скачайте новую на:\nhttps://github.com/MaxBro12/mylauncher'
@@ -46,9 +55,19 @@ def main_check():
 
 
 # ! ======== ПРОВЕРКИ и СОЗДАНИЕ =========
-def check_folder(wd: str):
+def check_app_dir(app_dir: str, config: ConfigParser):
+    if config['Main']['app_patch'] == '':
+        pass
+
+
+def check_data(wd: str):
     if not exists(f'{wd}/data'):
         mkdir('data')
+
+
+def check_tracks(wd: str):
+    if not exists(f'{wd}/tracks'):
+        mkdir('tracks')
 
 
 def check_settings():

@@ -8,4 +8,5 @@ test.*
 /app/data
 base.db
 test
+tracks
 patch.txt

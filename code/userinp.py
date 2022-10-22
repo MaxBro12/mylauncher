@@ -1,5 +1,9 @@
 from types import NoneType
 from copy import copy
+from os import (
+    getcwd,
+    path
+)
 
 from gitapi import (
     is_url_correct,
@@ -39,6 +43,7 @@ class UserInp:
             'checkpath': self.check_local_dir,
         }
         self.db = load_db()
+        self.app_dir = getcwd()
 
     def run(self):
         self.progrun = True
@@ -115,10 +120,23 @@ class UserInp:
         if not gitlink:
             return False
 
-        # ? Проверяем существование локальной папки
-        locallink = self.check_local_dir()
-        if not locallink:
-            return False
+        # ! Формируем словарь
+        logdata = clean_repo_http(gitlink)
+
+        # ? Куда будет отправлена папка с файлами?
+        locallink = ''
+        print(
+            'Куда сохранить репозиторий?\n' +
+            'Рекомендуется сохранять репозитории по пути:\n' +
+            f'{self.app_dir}\\tracks\\'
+        )
+        if input('Сохранить там? [Y / n]\n') == 'Y':
+            locallink = path.join(self.app_dir, 'tracks', logdata['repo'])
+            print(locallink)
+        else:
+            locallink = self.check_local_dir()
+            if not locallink:
+                return False
 
         # ? Спрашиваем о существовании ветки
         branch = input(
@@ -127,7 +145,6 @@ class UserInp:
         )
 
         # ! Формируем словарь
-        logdata = clean_repo_http(gitlink)
         logdata['location'] = locallink
         if branch != '':
             logdata['branch'] = branch
@@ -274,7 +291,6 @@ class UserInp:
 
             if input('Обновить? [Y / n]\n') == 'Y':
                 for track in need_up:
-                    print(track)
                     self.downloadtrack([track[0]['repo']])
         except Exception as error:
             print(error)

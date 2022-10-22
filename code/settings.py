@@ -1,6 +1,6 @@
 
 # ! Settings
-version = 'beta1.1'
+version = 'beta1.2'
 
 
 # ! URLS
@@ -10,6 +10,7 @@ url_set_file = 'https://github.com/MaxBro12/mylauncher/blob/master/source/settin
 # ! Files
 app_files = [
     '__pycache__',
+    'tracks',
     'data',
     'check.py',
     'mylauncher.py',

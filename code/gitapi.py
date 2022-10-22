@@ -15,7 +15,7 @@ dl_1 = 'https://raw.githubusercontent.com/'
 def is_url_correct(url: str = '') -> bool:
     '''Проверяет правильность ссылки на гитхаб'''
     api_should_be = r'[https://github.com/]'
-    if url.startswith('https:'):
+    if url.startswith('https://'):
         if match(api_should_be, url):
             if get(url).status_code == 200:
                 return True
@@ -26,7 +26,9 @@ def clean_repo_http(url: str = '', full: bool = False) -> dict:
     '''Возвращает словарь с ключами:\n
     user - имя пользователя\n
     repo - репозиторий\n
-    adt  - дополнительные коренные папки'''
+    adt  - дополнительные коренные папки
+    branch - ветка по которой идет скачивание
+    sha - последний коммит'''
     if is_url_correct(url):
         # ? Очистки
         url = url.replace('https://github.com/', '')
@@ -69,7 +71,7 @@ def get_content(
     api: str = git_api
 ) -> list:
     '''Получаем список всех файлов в конкретной папке'''
-    print(f'{api}/{user}/{repo}/contents/{adt}')
+    # print(f'{api}/{user}/{repo}/contents/{adt}')
     json = get(f'{api}/{user}/{repo}/contents/{adt}').json()
     return list(map(lambda x: {
         'name': json[x]['name'],
@@ -98,10 +100,9 @@ def get_all_files_data_git(url: Union[str, dict], consol: bool = False) -> list:
     else:
         data = url
 
+    # ? Узнаем из какой ветки будет скачивание
     temp = get_def_branch_sha(data)
-    try:
-        d = data['branch']
-    except KeyError:
+    if data.get('brach') is None:
         data['branch'], data['sha'] = temp
     else:
         data['sha'] = temp[1]

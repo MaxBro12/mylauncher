@@ -28,6 +28,14 @@ def is_folder(name: str) -> bool:
     return name.split('.') == 1
 
 
+def create_folder(path):
+    try:
+        mkdir(path)
+        return True
+    except Exception:
+        return False
+
+
 def remove_file(file_dir):
     '''Удаляет файл file_name в директории file_dir'''
     remove(f'file_dir')
@@ -56,6 +64,10 @@ def download_file(f_dict: dict, way: str):
 
 def download_repo(files: list, way: str):
     '''Скачивает все файлы и автоматически создает папки'''
+    # ! Проверяем существование папки
+    if not is_path_correct(way):
+        create_folder(way)
+
     # ! Отделяем названия папок и создаем их
     ways = []
     for f in files:
