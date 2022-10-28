@@ -10,6 +10,9 @@ from requests import get
 from shutil import rmtree
 
 from settings import app_files
+from gitget import (
+    getf
+)
 
 
 def check_empty_folder(check_dir, exept_files=app_files):
@@ -55,13 +58,6 @@ def get_all_files_dirdata():
 
 
 # ! =================== С К А Ч И В А Н И Е ===================
-def download_file(f_dict: dict, way: str):
-    '''Скачивает файл на путь way'''
-    with open(f"{way}/{f_dict['path']}", 'w') as f:
-        data = get(f_dict['url']).text
-        f.write(data)
-
-
 def download_repo(files: list, way: str):
     '''Скачивает все файлы и автоматически создает папки'''
     # ! Проверяем существование папки
@@ -84,7 +80,23 @@ def download_repo(files: list, way: str):
     # ! Тут скачиваем каждый файл отдельно
     for f in files:
         print(f"Скачивается: {f['name']} Размер: {f['size']}")
-        download_file(f, way)
+        download_file_beta(f, way)
+
+
+def download_file(f_dict: dict, way: str):
+    '''Скачивает файл на путь way'''
+    with open(f"{way}/{f_dict['path']}", 'w') as f:
+        data = getf(f_dict['url'])
+        f.write(data)
+
+
+def download_file_beta(f_dict: dict, way: str):
+    '''Скачивает данные с указаного f_dict в путь way'''
+    with get(f_dict['url'], stream=True, allow_redirects=True) as r:
+        r.raise_for_status()
+        with open(f"{way}/{f_dict['path']}", 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
 
 
 def download_file_test(url: str, way: str):

@@ -1,6 +1,6 @@
 
 # ! Settings
-version = 'beta1.2'
+version = 'beta1.3'
 
 
 # ! URLS
@@ -22,5 +22,6 @@ app_files = [
     'gitapi.py',
     'test.py',
     'dirwork.py',
+    'gitget.py',
     'py_to_exe.bat',
 ]

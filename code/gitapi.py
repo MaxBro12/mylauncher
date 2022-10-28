@@ -1,8 +1,12 @@
-from re import match
+from re import S, match
 from requests import get
 from typing import Union
 
 from dirwork import download_repo
+from gitget import (
+    status_code,
+    getf,
+)
 
 
 git_api = 'https://api.github.com/repos'
@@ -17,7 +21,7 @@ def is_url_correct(url: str = '') -> bool:
     api_should_be = r'[https://github.com/]'
     if url.startswith('https://'):
         if match(api_should_be, url):
-            if get(url).status_code == 200:
+            if status_code(url):
                 return True
     return False
 

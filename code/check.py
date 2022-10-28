@@ -1,12 +1,22 @@
 from os.path import exists
 from os import mkdir, getcwd
-from requests import get
 
-from dirwork import check_empty_folder
-from settings import url_set_file, version
-from requests import get
-from dbwork import check_db
-from configparser import ConfigParser
+from gitget import (
+    getf,
+)
+from dirwork import (
+    check_empty_folder,
+)
+from settings import (
+    url_set_file,
+    version,
+)
+from dbwork import (
+    check_db,
+)
+from configparser import (
+    ConfigParser
+)
 
 
 def main_check():
@@ -40,7 +50,7 @@ def main_check():
     # ! Проверка версии приложения
     try:
         config_call = ConfigParser()
-        config_call.read_string(get(f'{url_set_file}?raw=true').text)
+        config_call.read_string(getf(url_set_file))
 
         if config_call['Main']['version'] != version:
             print(
@@ -73,4 +83,4 @@ def check_tracks(wd: str):
 def check_settings():
     if not exists('data/settings.ini'):
         with open('data/settings.ini', 'w') as set_file:
-            set_file.write(get(f'{url_set_file}?raw=true').text)
+            set_file.write(getf(url_set_file))
