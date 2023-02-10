@@ -1,12 +1,29 @@
-from check import main_check
-from userinp import UserInp
+from core import create_log_file
+from handlers import (
+    main_check,
+    Program,
+)
+
+from sys import argv
 
 
-def main():
-    main_check()
-    user = UserInp()
-    user.run()
+def main(args: list = None):
+    config_dict = main_check()
+    process = Program(config_dict, args)
+    if args is None:
+        process.run()
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        argv.pop(0)
+        if argv == []:
+            argv = None
+        main(argv)
+    except Exception as er:
+        create_log_file(er)
+        print(
+            'Что-то пошло не так : (\n' +
+            'Отправьте файл "error.log" разработчику!\n' +
+            'maxbro126@gmail.com'
+        )
