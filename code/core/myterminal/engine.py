@@ -170,6 +170,8 @@ class UserInp:
             if param == '':
                 break
             else:
+                param = param.split(' ')
+                print('-->>> ' + str(param))
                 if param in self.config.keys():
                     new_val = input(self.lang['confnew'])
                     self.config[param] = new_val

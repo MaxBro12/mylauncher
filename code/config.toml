@@ -1,9 +1,0 @@
-os = "win"
-
-[MAIN]
-version = "beta1.3"
-debug = true
-lang = "ru"
-os = ""
-app_dir = ""
-tracks_dir = ""
