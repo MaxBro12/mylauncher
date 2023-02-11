@@ -1,5 +1,5 @@
 from toml import load, dump
-from .excep import ConfigException
+from .exceptions import ConfigException
 
 
 def read(way: str) -> dict:

@@ -2,7 +2,7 @@ from .myos import (
     get_os,
 )
 
-from .excep import (
+from .exceptions import (
     OsException,
 )
 

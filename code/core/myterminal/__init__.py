@@ -8,6 +8,6 @@ from .tomlreader import (
     write,
 )
 
-from .excep import (
+from .exceptions import (
     ConfigException,
 )

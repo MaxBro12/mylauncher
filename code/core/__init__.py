@@ -13,3 +13,8 @@ from .myos import (
     get_os,
     OsException,
 )
+
+from .mysql import (
+    dbcreator,
+    load_db,
+)

@@ -2,7 +2,7 @@ from .lang import (
     ru,
     en,
 )
-from .excep import (
+from .exceptions import (
     KillException,
 )
 from .eng_settings import (

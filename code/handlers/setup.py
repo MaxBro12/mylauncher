@@ -7,10 +7,16 @@ from os.path import (
 
 from core import (
     get_os,
+
+    # Конфиги
     ConfigException,
     read,
     write,
+
+    # База данных
+    dbcreator,
 )
+
 from .settings import (
     data_folder,
     config_file,
@@ -51,5 +57,4 @@ def check_data():
     if not exists(config_file):
         write(config_dict, config_file)
     if not exists(db_file):
-        print('DB NOT FOUND!')
-        pass
+        dbcreator(db_file)
