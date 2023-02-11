@@ -153,7 +153,7 @@ class UserInp:
                     for j in self.config[i]:
                         print(
                             f'{" " * len(self.config[i])}' +
-                            f'└ {j}{" " * (10 - len(str(j)))}->' +
+                            f'└ {j}{" " * (10 - len(str(j)))}-> ' +
                             f'{self.config[i][j]}'
                         )
                 else:
@@ -171,10 +171,15 @@ class UserInp:
                 break
             else:
                 param = param.split(' ')
-                print('-->>> ' + str(param))
-                if param in self.config.keys():
+                if len(param) > 1:
+                    if param[0] in self.config.keys():
+                        if param[1] in self.config[param[0]].keys():
+                            new_val = input(self.lang['confnew'])
+                            self.config[param[0]][param[1]] = new_val
+                            print_conf()
+                elif param[0] in self.config.keys():
                     new_val = input(self.lang['confnew'])
-                    self.config[param] = new_val
+                    self.config[param[0]] = new_val
                     print_conf()
                 else:
                     print(self.lang['confnotfound'])
