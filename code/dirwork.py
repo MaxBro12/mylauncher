@@ -5,6 +5,7 @@ from os import (
 )
 from os.path import (
     exists,
+    isdir,
 )
 from requests import get
 from shutil import rmtree
@@ -28,20 +29,24 @@ def is_path_correct(local_path: str) -> bool:
 
 
 def is_folder(name: str) -> bool:
-    return name.split('.') == 1
+    return isdir(name)
 
 
-def create_folder(path):
+def create_folder(path: str = 'NewFolder'):
     try:
         mkdir(path)
         return True
-    except Exception:
+    except FileExistsError:
         return False
 
 
-def remove_file(file_dir):
+def remove_file(file_dir: str) -> bool:
     '''Удаляет файл file_name в директории file_dir'''
-    remove(f'file_dir')
+    try:
+        remove(file_dir)
+        return True
+    except FileNotFoundError:
+        return False
 
 
 def remove_folderAfile(dir_name):
@@ -49,7 +54,7 @@ def remove_folderAfile(dir_name):
     try:
         rmtree(dir_name)
         return True
-    except Exception:
+    except FileNotFoundError:
         return False
 
 

@@ -14,7 +14,7 @@ from core import (
     write,
 
     # База данных
-    dbcreator,
+    create_db,
 )
 
 from .settings import (
@@ -57,4 +57,4 @@ def check_data():
     if not exists(config_file):
         write(config_dict, config_file)
     if not exists(db_file):
-        dbcreator(db_file)
+        create_db(db_file)
